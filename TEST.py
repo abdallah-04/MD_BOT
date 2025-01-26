@@ -19,9 +19,9 @@ name = sheet.acell(f"B{last_row}").value
 phone = sheet.acell(f"D{last_row}").value
 
 # Display message
-print(f"يعطيك العافيه {name} انا من IEEE computer society وانت مسجل بفورم الانضمام لسا حاب تسجل معنا ؟")
-print(f"the WhatsApp link: https://wa.me/962{phone}")
+message1=f"يعطيك العافيه {name} انا من IEEE computer society وانت مسجل بفورم الانضمام لسا حاب تسجل معنا ؟"
+message2=f"the WhatsApp link: https://wa.me/962{phone}"
 
 # Mention a random MD member to conect him 
 md_member = ["abdallah", "batool"]
-print("@" + random.choice(md_member))
+message3="@" + random.choice(md_member)
