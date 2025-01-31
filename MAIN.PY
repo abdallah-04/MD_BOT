@@ -12,7 +12,7 @@ creds = Credentials.from_service_account_file("credentials.json", scopes=scopes)
 client = gspread.authorize(creds)
 
 sheet_id = "1UPxC2R-C3fjSBwemS2bCa9AmcO4N3MYfMb0CEtCfY2Y"
-sheet = client.open_by_key(sheet_id).sheet1  # Open the first sheet
+sheet = client.open_by_key(sheet_id).sheet1  
 
 # Telegram Bot setup
 TOKEN = '7603868482:AAEqa_1uDvQJam6grPs0d1T-X9KxeFWP3PY'
@@ -21,7 +21,7 @@ BOT_USERNAME = '@MD_BAU_bot'
 # List of MD members
 md_members = ["abdallah", "batool"]
 
-# Function to get the last row
+
 def get_last_row():
     return len(sheet.col_values(2))
 
@@ -56,16 +56,16 @@ async def check_new_entries(update: Update, context: ContextTypes.DEFAULT_TYPE):
             print(f"Error checking new entries: {e}")
             await asyncio.sleep(60)
 
-# Start command
+
 async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("Bot started. Checking for new entries...")
     asyncio.create_task(check_new_entries(update, context))  # Run in background
 
-# Help command
+
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("My job is to help the MD members.")
 
-# Handle text responses
+
 def handle_response(text: str) -> str:
     processed: str = text.lower()
     if 'hello' in processed:
