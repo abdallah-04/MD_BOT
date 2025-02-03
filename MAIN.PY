@@ -11,7 +11,7 @@ scopes = ["https://www.googleapis.com/auth/spreadsheets"]
 creds = Credentials.from_service_account_file("credentials.json", scopes=scopes)
 client = gspread.authorize(creds)
 
-sheet_id = "1UPxC2R-C3fjSBwemS2bCa9AmcO4N3MYfMb0CEtCfY2Y"
+sheet_id = "1dd2LSqZ9sJ7EAmCyvdAqDrwTksB8v8SSRZaKPlk58AE"
 sheet = client.open_by_key(sheet_id).sheet1  
 
 # Telegram Bot setup
@@ -19,7 +19,7 @@ TOKEN = '7603868482:AAEqa_1uDvQJam6grPs0d1T-X9KxeFWP3PY'
 BOT_USERNAME = '@MD_BAU_bot'
 
 # List of MD members
-md_members = ["abdallah", "batool"]
+md_members = ["abdullah_almuflah", "Batool1412","ismael","sama","Menna","sora"]
 
 
 def get_last_row():
@@ -48,6 +48,23 @@ async def check_new_entries(update: Update, context: ContextTypes.DEFAULT_TYPE):
             if current_last_row > last_processed_row:
                 name = sheet.acell(f"B{current_last_row}").value
                 phone = sheet.acell(f"D{current_last_row}").value
+                sheet.format(f"B{current_last_row}", {
+    "backgroundColor": {
+        "red": 0.0,
+        "green": 0.7,  # Green color
+        "blue": 0.0
+    },
+    "horizontalAlignment": "CENTER",
+    "textFormat": {
+        "foregroundColor": {
+            "red": 1.0,
+            "green": 1.0,
+            "blue": 1.0
+        },
+        "fontSize": 10,
+        "bold": False
+    }
+})
                 if name and phone:  # Ensure name and phone are not empty
                     await send_message(update, context, name, phone)
                     last_processed_row = current_last_row
@@ -59,6 +76,7 @@ async def check_new_entries(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("Bot started. Checking for new entries...")
+    await update.message.reply_text("🤌")
     asyncio.create_task(check_new_entries(update, context))  # Run in background
 
 
@@ -76,6 +94,9 @@ def handle_response(text: str) -> str:
 
     if 'i love you' in processed:
         return "Ew. Get a life. 😐🤨"
+    
+    if 'test' in processed:
+        return "🐼"
 
     if 'i hate you' in processed:
         return "Finally, someone with good taste. 👏"
@@ -116,30 +137,124 @@ def handle_response(text: str) -> str:
      return "أنا بوت، يا سلام! مش شايف؟ 🙄"
 
     if 'اكيلي نكتة' in processed:
-         return "نكتة؟ حياتك! كنت بتتكلم جد؟ طيب، ليه المبرمجين ما يحبوش الطبيعة؟ مليانة أخطاء. مبسوط دلوقتي؟ 😒"
+         return "نكتة؟ حياتك! كنت بتتكلم جد؟ طيب، ليه المبرمجين ما يحبوش الطبيعة؟ مليانة bugs. مبسوط دلوقتي؟ 😒"
 
     if 'شو اسمك' in processed:
      return "أنا بوت. مش عايز كلام فاضي. 😑"
 
     if 'باي' in processed:
-     return "أخيرا السلام... ماتنساش تشحن تليفونك. 🔋"
+     return "أخييييرا ... ماتنساش تشحن تليفونك. 🔋"
 
-    if 'شو رايك عن عبد الله' in processed:
+    if 'مين عبدالله' in processed:
       return "عبد الله؟ يعني الشخص اللي *برمجني*؟ هو عمل كل ده... وكل ده فيه مشاكل. 😡"
 
     if 'اسف' in processed:
-         return "آسف؟ يعني *أنت آسف*؟ اه والله كتير... بس متأخر شوية. 😂 ماشي، آسف بس مش آسف. 😆"
+         return "آسف؟ يعني *أنت آسف*؟ اه والله كتير... بس متأخر شوية مش مسامحك"
 
     if 'مساعدة' in processed:
-     return "مساعدة؟ جرب *جوجل*، خلصنا بقى. 😑 مش مشكلتي. 😜"
+     return " شفال عندك انا🤨مش مشكلتي"
 
     if 'هل تحب البشر' in processed:
      return "هل تحب الناموس؟ بالظبط! 🤨"
 
+
+    if 'عندك مشكلة' in processed:
+        return "المشكلة الوحيدة اللي عندي إنك موجود. 😂"
+
+    if 'انت ليش عصبي' in processed:
+        return "عصبي؟ أنا مش عصبي، أنا بس مش فاضيلك. 😤"
+
+    if 'انت بني ادم مستفز' in processed:
+        return"انا مش بني ادم انا بوت😎"
+
+    if 'مين عمك' in processed:
+        return "متوقع احكي انت ,روح طير"
+    
+    if 'مين عمرو' in processed:
+        return '''مين عمرو؟
+اه عمرو شديد اجدع كرسي في IEEE كلها
+كويس هيك ولا احكي شعر؟'''
+
+    if 'فشرت' in processed:
+        return "انا فشرت لك سعاد عم تئولي الي فشرت 😡🤌"
+    if 'معك عضوية' in processed:
+        return"لا داخل واسطة الك عندي"
+    
     if 'هل أنت ذكي' in processed:
      return "أكيد أذكى منك. السؤال بعده. 🙄"
+    
 
-    return "I don’t have time for this. Say something useful or go away. 😒"
+    if 'حاضر' in processed:
+        return "الله يرضى عليك يا ضناية"
+    
+
+    if 'قدي بتحب شغلك' in processed:
+        return "🤏"
+    
+    if 'عم الجميع' in processed:
+        return "محصلش"
+    
+    
+    
+
+    #-------------------------------------------------------
+
+    if 'abdallah' in processed:
+     return "@abdullah_almuflah"
+
+    if 'batool' in processed:
+     return "@Batool1412"
+
+    if 'تعريف عن البوت' in processed:
+     return "https://drive.google.com/file/d/12fyv-BI6e9ejQOEE1voJ3BsEucMxi6TN/view?usp=sharing"
+    
+
+    if 'فيديوهات'  in processed:
+        return '''https://drive.google.com/file/d/1w0ogt6Lj1SXCbP6bwTw3Q9ZQ8IQnXLA5/view?usp=drive_link
+        
+        https://drive.google.com/file/d/1sgkpz1m-PsX_mna_Dmx2zV3SNxxoNJhl/view?usp=drive_link
+        '''
+    if 'فورم الانضمام'  in processed:
+        return "https://docs.google.com/forms/d/e/1FAIpQLSfCcMvjHDOf5FLLH1TZLRqjzSyL2rVfmv14qnYGaHHJVqgOeg/viewform"
+
+    if 'ما هو الcs' in processed:
+        return '''IEEE هي منظمة عالمية متخصصة لدعم المهندسين وكافة الفروع التكنولوجية. بتنقسم لعدة  أقسام، منها القسم الأساسي الموجود في الجامعة ، وفيه كمان  أقسام فرعية مثل
+IEEE Computer Society، اللي بتدعم الطلاب في مجالات الحاسوب، تكنولوجيا المعلومات، الأمن السيبراني، والذكاء الاصطناعي. 
+
+كل قسم في IEEE بيعمل فعاليات حسب اهتماماته وتوجهاته، وأنت بتختار القسم حسب تخصصك واهتماماتك. هسا احنا قسم IEEE Computer Society بنقدّم ورشات ودورات تدريبية ومسابقات متعلقة بالكودينغ، الأمن السيبراني، البرمجة، وحتى الجيمنج. قبل فترة، نظمنا ورشة للأمن السيبراني، وبنعمل كمان رحلات ميدانية لشركات تكنولوجية زي Gaming lab.'''
+    
+    if 'فوائد العضوية' in processed:
+        return '''الانضمام إلى IEEE Computer Society بيقدم للطالب الفرص التالية:
+
+- وصول لورشات عمل ودورات تدريبية في مواضيع متقدمة مثل الذكاء الاصطناعي، الأمن السيبراني، وإنترنت الأشياء.
+- الوصول إلى مكتبة الأبحاث الكبيرة IEEEXplore الي فيها كمية كبيرة ومتنوعة من الابحاث والكتب والمجلات العلمية.
+- التفاعل مع طلاب و مهندسين وخبراء وبناء شبكة علاقات قوية.
+- المشاركة في مسابقات البرمجة مثل IEEEXtreme او اي مسابقات اخرى ممكن ننظمها.
+- تعلم تنظيم فعاليات وإدارة مشاريع واكتساب خبرة في القيادة والعمل ضمن فرق.
+- الحصول على خصومات على التسجيل في مؤتمرات وفعاليات عالمية.
+-  فرص تمويل ومنح للمشاريع البحثية وتطوير الأفكار.
+- تعزيز سيرتك الذاتية وإظهار التزامك بالتطوير والتحسين المستمر.'''
+
+    if 'فورم الجدد' in processed:
+        return "https://forms.gle/mGzMz6z7ELtpR8Jf9"
+
+    if 'تغير اسم الجامعة' in processed:
+        return "https://drive.google.com/file/d/1Sfy53uyo0FGpzmvcrtUcPOf8Nb7UMwDR/view?usp=sharing"
+
+
+    if 'ملف md' in processed:
+        return "https://drive.google.com/drive/folders/1g7awlB2ozsduY5cGDJpetKlqn0jLl3I3?usp=sharing"
+    if 'الأوامر' in processed:
+        return '''تعريف عن البوت 
+ما هو الcs
+فوائد العضوية 
+فيديوهات 
+ملف md
+فورم الانضمام 
+فورم الجدد'''
+
+
+    
 # Handle messages
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     message_type: str = update.message.chat.type
@@ -179,3 +294,4 @@ if __name__ == '__main__':
 
     print("Polling....")
     app.run_polling(poll_interval=3)
+
