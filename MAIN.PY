@@ -19,23 +19,27 @@ TOKEN = '7603868482:AAEqa_1uDvQJam6grPs0d1T-X9KxeFWP3PY'
 BOT_USERNAME = '@MD_BAU_bot'
 
 # List of MD members
-md_members = ["abdullah_almuflah", "Batool1412","ismael","sama","Menna","sora"]
+md_members = ["abdullah_almuflah", "Batool1412","samaweshah","Janabaha2","sura"]
 
 
 def get_last_row():
     return len(sheet.col_values(2))
 
 # Function to send message via Telegram bot
-async def send_message(update: Update, context: ContextTypes.DEFAULT_TYPE, name: str, phone: str):
+async def send_message(update: Update, context: ContextTypes.DEFAULT_TYPE, name: str, phone: str,current_last_row :int):
     try:
         first_name = name.split()[0]
         message1 = f"يعطيك العافيه {first_name} انا من IEEE computer society وانت مسجل بفورم الانضمام لسا حاب تسجل معنا ؟"
         message2 = f"the WhatsApp link: https://wa.me/962{phone}"
         message3 = "@" + random.choice(md_members)
+        message4 = current_last_row
+
 
         await update.message.reply_text(message1)
         await update.message.reply_text(message2)
         await update.message.reply_text(message3)
+        await update.message.reply_text(message4)
+
     except Exception as e:
         print(f"Error sending message: {e}")
 
@@ -48,25 +52,25 @@ async def check_new_entries(update: Update, context: ContextTypes.DEFAULT_TYPE):
             if current_last_row > last_processed_row:
                 name = sheet.acell(f"B{current_last_row}").value
                 phone = sheet.acell(f"D{current_last_row}").value
-                sheet.format(f"B{current_last_row}", {
+                sheet.format(f"I{current_last_row}", {
     "backgroundColor": {
-        "red": 0.0,
-        "green": 0.7,  # Green color
-        "blue": 0.0
+        "red": 1.0,    
+        "green": 1.0,  
+        "blue": 0.0    
     },
     "horizontalAlignment": "CENTER",
     "textFormat": {
         "foregroundColor": {
-            "red": 1.0,
-            "green": 1.0,
-            "blue": 1.0
+            "red": 1.0,    
+            "green": 1.0,  
+            "blue": 1.0    
         },
         "fontSize": 10,
         "bold": False
     }
 })
                 if name and phone:  # Ensure name and phone are not empty
-                    await send_message(update, context, name, phone)
+                    await send_message(update, context, name, phone,current_last_row )
                     last_processed_row = current_last_row
             await asyncio.sleep(60)  # Check every 60 seconds
         except Exception as e:
@@ -84,10 +88,42 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("My job is to help the MD members.")
 
 
+async def update_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    # Ensure the user provides a row number
+    if not context.args:
+        await update.message.reply_text("😅 شكلك نايش شغلة! جرب: `/update <number>`")
+        return
+
+    try:
+        row_number = int(context.args[0])  
+
+       
+        sheet.format(f"I{row_number}", {
+            "backgroundColor": {"red": 0.0, "green": 0.7, "blue": 0.0},
+            "horizontalAlignment": "CENTER",
+            "textFormat": {
+                "foregroundColor": {"red": 1.0, "green": 1.0, "blue": 1.0},
+                "fontSize": 10,
+                "bold": False
+            }
+        })
+
+        
+        responses = [
+            f"✅ Boom! Row {row_number} is now updated",
+        ]
+
+        await update.message.reply_text(random.choice(responses))
+
+    except ValueError:
+        await update.message.reply_text("😅 Oops! That’s not a valid row number")
+
+
+   
+
+
 def handle_response(text: str) -> str:
     processed: str = text.lower()
-
-    #-------------------------------------------------------
 
     if 'abdallah' in processed:
      return "@abdullah_almuflah"
@@ -134,6 +170,7 @@ IEEE Computer Society، اللي بتدعم الطلاب في مجالات ال�
 
     if 'ملف md' in processed:
         return "https://drive.google.com/drive/folders/1g7awlB2ozsduY5cGDJpetKlqn0jLl3I3?usp=sharing"
+
     if 'الأوامر' in processed:
         return '''تعريف عن البوت 
 ما هو الcs
@@ -142,9 +179,6 @@ IEEE Computer Society، اللي بتدعم الطلاب في مجالات ال�
 ملف md
 فورم الانضمام 
 فورم الجدد'''
-
-
-    
 # Handle messages
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     message_type: str = update.message.chat.type
@@ -169,12 +203,14 @@ async def error(update: Update, context: ContextTypes.DEFAULT_TYPE):
     print(f'Update {update} caused error {context.error}')
 
 if __name__ == '__main__':
-    print("Starting bot....")
+    print("Starting bot...")
+    
     app = Application.builder().token(TOKEN).build()
 
     # Command handlers
     app.add_handler(CommandHandler('start', start_command))
     app.add_handler(CommandHandler('help', help_command))
+    app.add_handler(CommandHandler('update', update_command))
 
     # Message handler
     app.add_handler(MessageHandler(filters.TEXT, handle_message))
@@ -182,6 +218,6 @@ if __name__ == '__main__':
     # Error handler
     app.add_error_handler(error)
 
-    print("Polling....")
-    app.run_polling(poll_interval=3)
+    print("Polling...")
 
+    app.run_polling(poll_interval=3)  # No need for asyncio.run()
