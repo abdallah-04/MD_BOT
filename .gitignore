@@ -1,6 +1,0 @@
-*.env
-venv/
-*.json
-.env
-credentials.json
-md_bot
