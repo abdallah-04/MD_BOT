@@ -4,3 +4,5 @@ venv/
 .env
 credentials.json
 md_bot
+__pycache__
+.gitattributes
