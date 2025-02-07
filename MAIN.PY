@@ -5,18 +5,20 @@ from google.oauth2.service_account import Credentials
 import gspread
 from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
-
+from dotenv import load_dotenv,dotenv_values
+import os
+load_dotenv()
 # Google Sheets API setup
 scopes = ["https://www.googleapis.com/auth/spreadsheets"]
 creds = Credentials.from_service_account_file("credentials.json", scopes=scopes)
 client = gspread.authorize(creds)
 
-sheet_id = "1dd2LSqZ9sJ7EAmCyvdAqDrwTksB8v8SSRZaKPlk58AE"
+sheet_id = os.getenv("SHEET_ID")
 sheet = client.open_by_key(sheet_id).sheet1  
 
 # Telegram Bot setup
-TOKEN = '7603868482:AAEqa_1uDvQJam6grPs0d1T-X9KxeFWP3PY'
-BOT_USERNAME = '@MD_BAU_bot'
+token = os.getenv("TOKEN")
+bot_username = os.getenv("BOT_USERNAME")
 
 # List of MD members
 md_members = ["abdullah_almuflah", "Batool1412","samaweshah","Janabaha2","sura"]
@@ -55,7 +57,7 @@ async def check_new_entries(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 sheet.format(f"I{current_last_row}", {
     "backgroundColor": {
         "red": 1.0,    
-        "green": 1.0,  
+        "green": 0.7,  
         "blue": 0.0    
     },
     "horizontalAlignment": "CENTER",
@@ -88,10 +90,12 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("My job is to help the MD members.")
 
 
+
+# Function to update the sheet when one of the MD member conivt whait him 
 async def update_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    # Ensure the user provides a row number
+    
     if not context.args:
-        await update.message.reply_text("😅 شكلك نايش شغلة! جرب: `/update <number>`")
+        await update.message.reply_text("😅 شكلك نايش شغلة! جرب: /update <number>")
         return
 
     try:
@@ -124,6 +128,8 @@ async def update_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 def handle_response(text: str) -> str:
     processed: str = text.lower()
+
+
 
     if 'abdallah' in processed:
      return "@abdullah_almuflah"
@@ -187,8 +193,8 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     print(f'User ({update.message.chat.id}) in {message_type}: "{text}"')
 
     if message_type == 'group':
-        if BOT_USERNAME in text:
-            new_text: str = text.replace(BOT_USERNAME, '').strip()
+        if bot_username in text:
+            new_text: str = text.replace(bot_username, '').strip()
             response: str = handle_response(new_text)
         else:
             return
@@ -205,7 +211,7 @@ async def error(update: Update, context: ContextTypes.DEFAULT_TYPE):
 if __name__ == '__main__':
     print("Starting bot...")
     
-    app = Application.builder().token(TOKEN).build()
+    app = Application.builder().token(token).build()
 
     # Command handlers
     app.add_handler(CommandHandler('start', start_command))
