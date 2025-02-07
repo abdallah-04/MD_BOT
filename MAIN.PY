@@ -91,11 +91,11 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 
-# Function to update the sheet when one of the MD member conivt whait him 
+# Function to update the sheet when one of the MD member conivt  him 
 async def update_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     if not context.args:
-        await update.message.reply_text("😅 شكلك نايش شغلة! جرب: /update <number>")
+        await update.message.reply_text("🙄 شكلك ناسي شغلة! جرب: /update <number>")
         return
 
     try:
