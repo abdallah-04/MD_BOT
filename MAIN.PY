@@ -9,7 +9,7 @@ from dotenv import load_dotenv,dotenv_values
 import os
 load_dotenv()
 # Google Sheets API setup
-scopes = ["https://www.googleapis.com/auth/spreadsheets"]
+scopes = ["git"]
 creds = Credentials.from_service_account_file("credentials.json", scopes=scopes)
 client = gspread.authorize(creds)
 
