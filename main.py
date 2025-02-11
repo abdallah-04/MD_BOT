@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import time
 import math
 import random
@@ -267,3 +268,5 @@ if __name__ == '__main__':
     print("Polling...")
 
     app.run_polling(poll_interval=3)  
+=======
+>>>>>>> 9ff3ebfa8c3cad30f4e0c12320965f9be9ea7af5
