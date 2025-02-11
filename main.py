@@ -1,4 +1,5 @@
 import time
+import math
 import random
 import asyncio
 from google.oauth2.service_account import Credentials
@@ -15,6 +16,7 @@ client = gspread.authorize(creds)
 
 sheet_id = os.getenv("SHEET_ID")
 sheet = client.open_by_key(sheet_id).sheet1  
+
 
 # Telegram Bot setup
 token = os.getenv("TOKEN")
@@ -124,6 +126,42 @@ async def update_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
    
+async def jop_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    
+    spreadsheet = client.open_by_key(sheet_id)
+    worksheet = spreadsheet.worksheet("jop_command")
+    numbers_list = worksheet.col_values(1)
+    
+    
+    num_of_member = len(numbers_list) // len(md_members)
+    remainder = len(numbers_list) % len(md_members)
+    count = 0
+    for i in range(len(md_members)):
+        
+        current_chunk = num_of_member + 1 if i < remainder else num_of_member
+        member_numbers = numbers_list[count:count + current_chunk]
+        count += current_chunk
+        message = f"Member: @{md_members[i]}\n"
+        for number in member_numbers:
+            cleaned_number = str(number).strip()
+            message += f"WhatsApp link: https://wa.me/962{cleaned_number}\n"
+        await update.message.reply_text(message)    
+
+
+
+# Function to mention all the number in the sheet 
+async def mention_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    spreadsheet = client.open_by_key(sheet_id) 
+    worksheet = spreadsheet.worksheet("mention_command")
+    numbers_list = worksheet.col_values(1) 
+    message_num = ""  
+    for i in numbers_list:
+        message_num += f"  @{i}"  
+    if message_num.strip():  
+        await update.message.reply_text(message_num)
+    else:
+        await update.message.reply_text("No data found")
+
 
 
 def handle_response(text: str) -> str:
@@ -217,6 +255,8 @@ if __name__ == '__main__':
     app.add_handler(CommandHandler('start', start_command))
     app.add_handler(CommandHandler('help', help_command))
     app.add_handler(CommandHandler('update', update_command))
+    app.add_handler(CommandHandler('mention', mention_command))
+    app.add_handler(CommandHandler('jop', jop_command))
 
     # Message handler
     app.add_handler(MessageHandler(filters.TEXT, handle_message))
@@ -226,4 +266,4 @@ if __name__ == '__main__':
 
     print("Polling...")
 
-    app.run_polling(poll_interval=3)  # No need for asyncio.run()
+    app.run_polling(poll_interval=3)  
