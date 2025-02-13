@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import time
 import math
 import random
@@ -128,26 +127,25 @@ async def update_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
    
 async def jop_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    
+    md_members2 = ["Batool1412","samaweshah","Janabaha2","abdullah_almuflah"]
     spreadsheet = client.open_by_key(sheet_id)
     worksheet = spreadsheet.worksheet("jop_command")
     numbers_list = worksheet.col_values(1)
-    
-    
-    num_of_member = len(numbers_list) // len(md_members)
-    remainder = len(numbers_list) % len(md_members)
+
+
+    num_of_member = len(numbers_list) // len(md_members2)
+    remainder = len(numbers_list) % len(md_members2)
     count = 0
-    for i in range(len(md_members)):
-        
+    for i in range(len(md_members2)):
+
         current_chunk = num_of_member + 1 if i < remainder else num_of_member
         member_numbers = numbers_list[count:count + current_chunk]
         count += current_chunk
-        message = f"Member: @{md_members[i]}\n"
+        message = f"Member: @{md_members2[i]}\n"
         for number in member_numbers:
             cleaned_number = str(number).strip()
             message += f"WhatsApp link: https://wa.me/962{cleaned_number}\n"
-        await update.message.reply_text(message)    
-
+        await update.message.reply_text(message)
 
 
 # Function to mention all the number in the sheet 
@@ -162,6 +160,19 @@ async def mention_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text(message_num)
     else:
         await update.message.reply_text("No data found")
+
+
+# async def _command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+#     spreadsheet = client.open_by_key(sheet_id) 
+#     worksheet = spreadsheet.worksheet("mention_command")
+#     numbers_list = worksheet.col_values(1) 
+#     message_num = ""  
+#     for i in numbers_list:
+#         message_num += f"  @{i}"  
+#     if message_num.strip():  
+#         await update.message.reply_text(message_num)
+#     else:
+#         await update.message.reply_text("No data found") 
 
 
 
@@ -268,5 +279,5 @@ if __name__ == '__main__':
     print("Polling...")
 
     app.run_polling(poll_interval=3)  
-=======
->>>>>>> 9ff3ebfa8c3cad30f4e0c12320965f9be9ea7af5
+
+
