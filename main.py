@@ -10,7 +10,7 @@ from dotenv import load_dotenv,dotenv_values
 import os
 load_dotenv()
 # Google Sheets API setup
-scopes = ["https://www.googleapis.com/auth/spreadsheets"]
+scopes = [os.getenv("SCOPES")]
 creds = Credentials.from_service_account_file("credentials.json", scopes=scopes)
 client = gspread.authorize(creds)
 
@@ -225,7 +225,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     print('Bot: Response sent')
 
-# The rest of your code (error handler, app setup) remains the same
+
 
 # Error handler
 async def error(update: Update, context: ContextTypes.DEFAULT_TYPE):
