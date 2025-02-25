@@ -127,9 +127,9 @@ async def update_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
    
 async def jop_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    md_members2 = ["Batool1412","samaweshah","Janabaha2","abdullah_almuflah"]
     spreadsheet = client.open_by_key(sheet_id)
     worksheet = spreadsheet.worksheet("jop_command")
+    md_members2 = worksheet.col_values(2)
     numbers_list = worksheet.col_values(1)
 
 
@@ -155,7 +155,7 @@ async def mention_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     numbers_list = worksheet.col_values(1) 
     message_num = ""  
     for i in numbers_list:
-        message_num += f"  @{i}"  
+        message_num += f"  @+962{i}"  
     if message_num.strip():  
         await update.message.reply_text(message_num)
     else:
@@ -176,66 +176,38 @@ async def mention_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 
-def handle_response(text: str) -> str:
+async def handle_response(update: Update, context: ContextTypes.DEFAULT_TYPE, text: str) -> None:
+    spreadsheet = client.open_by_key(sheet_id) 
+    worksheet = spreadsheet.worksheet("data fot the bot")
     processed: str = text.lower()
 
+    if 'فورم الانضمام' in processed:
+        await update.message.reply_text(worksheet.acell('B1').value)
+    elif 'فورم الجدد' in processed:
+        await update.message.reply_text(worksheet.acell('B2').value)
+    elif 'ملف md' in processed:
+        await update.message.reply_text(worksheet.acell('B3').value)
+    elif 'تعريف عن البوت' in processed:
+        await update.message.reply_text(worksheet.acell('B4').value)
+    elif 'فيديوهات' in processed:
+        await update.message.reply_text(worksheet.acell('B5').value)
+    elif 'ما هو الcs' in processed:
+        await update.message.reply_text(worksheet.acell('B6').value)
+    elif 'فوائد العضوية' in processed:
+        await update.message.reply_text(worksheet.acell('B7').value)
+    elif 'الأوامر' in processed:
+        await update.message.reply_text(worksheet.acell('B8').value)
+    elif 'get CS certification' in processed:
+        await update.message.reply_text(worksheet.acell('B9').value)
+    elif 'IEEE membership information' in processed:
+        await update.message.reply_text(worksheet.acell('B10').value)
+    elif 'join CS for ieee member' in processed:
+        await update.message.reply_text(worksheet.acell('B11').value)
+    elif 'Renew' in processed:
+        await update.message.reply_text(worksheet.acell('B12').value)
+    elif 'تغير اسم الجامعة' in processed:
+        await update.message.reply_text(worksheet.acell('B13').value)
 
-
-    if 'abdallah' in processed:
-     return "@abdullah_almuflah"
-
-    if 'batool' in processed:
-     return "@Batool1412"
-
-    if 'تعريف عن البوت' in processed:
-     return "https://drive.google.com/file/d/12fyv-BI6e9ejQOEE1voJ3BsEucMxi6TN/view?usp=sharing"
-    
-
-    if 'فيديوهات'  in processed:
-        return '''https://drive.google.com/file/d/1w0ogt6Lj1SXCbP6bwTw3Q9ZQ8IQnXLA5/view?usp=drive_link
-        
-        https://drive.google.com/file/d/1sgkpz1m-PsX_mna_Dmx2zV3SNxxoNJhl/view?usp=drive_link
-        '''
-    if 'فورم الانضمام'  in processed:
-        return "https://docs.google.com/forms/d/e/1FAIpQLSfCcMvjHDOf5FLLH1TZLRqjzSyL2rVfmv14qnYGaHHJVqgOeg/viewform"
-
-    if 'ما هو الcs' in processed:
-        return '''IEEE هي منظمة عالمية متخصصة لدعم المهندسين وكافة الفروع التكنولوجية. بتنقسم لعدة  أقسام، منها القسم الأساسي الموجود في الجامعة ، وفيه كمان  أقسام فرعية مثل
-IEEE Computer Society، اللي بتدعم الطلاب في مجالات الحاسوب، تكنولوجيا المعلومات، الأمن السيبراني، والذكاء الاصطناعي. 
-
-كل قسم في IEEE بيعمل فعاليات حسب اهتماماته وتوجهاته، وأنت بتختار القسم حسب تخصصك واهتماماتك. هسا احنا قسم IEEE Computer Society بنقدّم ورشات ودورات تدريبية ومسابقات متعلقة بالكودينغ، الأمن السيبراني، البرمجة، وحتى الجيمنج. قبل فترة، نظمنا ورشة للأمن السيبراني، وبنعمل كمان رحلات ميدانية لشركات تكنولوجية زي Gaming lab.'''
-    
-    if 'فوائد العضوية' in processed:
-        return '''الانضمام إلى IEEE Computer Society بيقدم للطالب الفرص التالية:
-
-- وصول لورشات عمل ودورات تدريبية في مواضيع متقدمة مثل الذكاء الاصطناعي، الأمن السيبراني، وإنترنت الأشياء.
-- الوصول إلى مكتبة الأبحاث الكبيرة IEEEXplore الي فيها كمية كبيرة ومتنوعة من الابحاث والكتب والمجلات العلمية.
-- التفاعل مع طلاب و مهندسين وخبراء وبناء شبكة علاقات قوية.
-- المشاركة في مسابقات البرمجة مثل IEEEXtreme او اي مسابقات اخرى ممكن ننظمها.
-- تعلم تنظيم فعاليات وإدارة مشاريع واكتساب خبرة في القيادة والعمل ضمن فرق.
-- الحصول على خصومات على التسجيل في مؤتمرات وفعاليات عالمية.
--  فرص تمويل ومنح للمشاريع البحثية وتطوير الأفكار.
-- تعزيز سيرتك الذاتية وإظهار التزامك بالتطوير والتحسين المستمر.'''
-
-    if 'فورم الجدد' in processed:
-        return "https://forms.gle/mGzMz6z7ELtpR8Jf9"
-
-    if 'تغير اسم الجامعة' in processed:
-        return "https://drive.google.com/file/d/1Sfy53uyo0FGpzmvcrtUcPOf8Nb7UMwDR/view?usp=sharing"
-
-
-    if 'ملف md' in processed:
-        return "https://drive.google.com/drive/folders/1g7awlB2ozsduY5cGDJpetKlqn0jLl3I3?usp=sharing"
-
-    if 'الأوامر' in processed:
-        return '''تعريف عن البوت 
-ما هو الcs
-فوائد العضوية 
-فيديوهات 
-ملف md
-فورم الانضمام 
-فورم الجدد'''
-# Handle messages
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     message_type: str = update.message.chat.type
     text: str = update.message.text
@@ -245,14 +217,15 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if message_type == 'group':
         if bot_username in text:
             new_text: str = text.replace(bot_username, '').strip()
-            response: str = handle_response(new_text)
+            await handle_response(update, context, new_text)
         else:
             return
     else:
-        response: str = handle_response(text)
+        await handle_response(update, context, text)
 
-    print('Bot:', response)
-    await update.message.reply_text(response)
+    print('Bot: Response sent')
+
+# The rest of your code (error handler, app setup) remains the same
 
 # Error handler
 async def error(update: Update, context: ContextTypes.DEFAULT_TYPE):
