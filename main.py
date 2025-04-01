@@ -73,10 +73,10 @@ async def check_new_entries(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "bold": False
     }
 })
-                if name and phone:  # Ensure name and phone are not empty
+                if name and phone:  
                     await send_message(update, context, name, phone,current_last_row )
                     last_processed_row = current_last_row
-            await asyncio.sleep(60)  # Check every 60 seconds
+            await asyncio.sleep(60)  
         except Exception as e:
             print(f"Error checking new entries: {e}")
             await asyncio.sleep(60)
@@ -84,8 +84,8 @@ async def check_new_entries(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("Bot started. Checking for new entries...")
-    await update.message.reply_text("🤌")
-    asyncio.create_task(check_new_entries(update, context))  # Run in background
+    await update.message.re
+    asyncio.create_task(check_new_entries(update, context))  
 
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -129,24 +129,50 @@ async def update_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def jop_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     spreadsheet = client.open_by_key(sheet_id)
     worksheet = spreadsheet.worksheet("jop_command")
-    md_members2 = worksheet.col_values(2)
-    numbers_list = worksheet.col_values(1)
+    
+    # Fetch data and filter valid numbers
+    numbers_list = [num.strip() for num in worksheet.col_values(1) if num.strip().isdigit()]
+    md_members2 = worksheet.col_values(4)
+    md_members3 = worksheet.col_values(3)
+    
+    # Ensure members and metadata are aligned
+    if len(md_members2) != len(md_members3):
+        await update.message.reply_text("Mismatched member data!")
+        return
 
-
-    num_of_member = len(numbers_list) // len(md_members2)
-    remainder = len(numbers_list) % len(md_members2)
+    total_numbers = len(numbers_list)
+    total_members = len(md_members2)
+    
+    num_per_member, remainder = divmod(total_numbers, total_members)
+    
+    updates = []
     count = 0
-    for i in range(len(md_members2)):
-
-        current_chunk = num_of_member + 1 if i < remainder else num_of_member
+    count_row = 0
+    
+    for i in range(total_members):
+        current_chunk = num_per_member + 1 if i < remainder else num_per_member
         member_numbers = numbers_list[count:count + current_chunk]
         count += current_chunk
+        
+        if not member_numbers:
+            continue  # Skip members with no numbers
+        
         message = f"Member: @{md_members2[i]}\n"
         for number in member_numbers:
-            cleaned_number = str(number).strip()
-            message += f"WhatsApp link: https://wa.me/962{cleaned_number}\n"
-        await update.message.reply_text(message)
-
+            count_row += 1
+            message += f"WhatsApp link: https://wa.me/962{number}\n"
+            updates.append({'range': f'B{count_row}', 'values': [[md_members3[i]]]})
+        
+        # Send message in chunks if too long
+        if len(message) > 4096:
+            for chunk in [message[i:i+4096] for i in range(0, len(message), 4096)]:
+                await update.message.reply_text(chunk)
+        else:
+            await update.message.reply_text(message)
+    
+    # Batch update Google Sheet
+    if updates:
+        worksheet.batch_update(updates)
 
 # Function to mention all the number in the sheet 
 async def mention_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
