@@ -23,7 +23,7 @@ token = os.getenv("TOKEN")
 bot_username = os.getenv("BOT_USERNAME")
 
 # List of MD members
-md_members = ["abdullah_almuflah", "Batool1412","samaweshah","Janabaha2","sura"]
+md_members = ["abdullah_almuflah", "Batool1412","samaweshah","Janabaha2","saja_alkhateeb97"]
 
 
 def get_last_row():
@@ -93,17 +93,17 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 
-# Function to update the sheet when one of the MD member conivt  him 
+# Function to update the sheet when one of the MD member send the message 
 async def update_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     if not context.args:
-        await update.message.reply_text("🙄 شكلك ناسي شغلة! جرب: /update <number>")
+        await update.message.reply_text("🙄 شكلك ناسي شغلة! جرب:\n /update <number>")
         return
 
     try:
-        row_number = int(context.args[0])  
+        row_number = int(context.args[0])
 
-       
+
         sheet.format(f"I{row_number}", {
             "backgroundColor": {"red": 0.0, "green": 0.7, "blue": 0.0},
             "horizontalAlignment": "CENTER",
@@ -114,15 +114,20 @@ async def update_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
             }
         })
 
-        
+
         responses = [
-            f"✅ Boom! Row {row_number} is now updated",
+            f"Magic happened! ID {row_number} is now green!",
+            f"Poof! ID {row_number} just turned green!",
+            f"Boomshakalaka! ID {row_number} is now fresh and fancy!",
+            f"ID {row_number} is now fresh and green—mission complete!",
         ]
 
         await update.message.reply_text(random.choice(responses))
 
     except ValueError:
         await update.message.reply_text("😅 Oops! That’s not a valid row number")
+
+
 
 
    
@@ -163,7 +168,7 @@ async def jop_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
             message += f"WhatsApp link: https://wa.me/962{number}\n"
             updates.append({'range': f'B{count_row}', 'values': [[md_members3[i]]]})
         
-        # Send message in chunks if too long
+        
         if len(message) > 4096:
             for chunk in [message[i:i+4096] for i in range(0, len(message), 4096)]:
                 await update.message.reply_text(chunk)
@@ -186,19 +191,6 @@ async def mention_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text(message_num)
     else:
         await update.message.reply_text("No data found")
-
-
-# async def _command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-#     spreadsheet = client.open_by_key(sheet_id) 
-#     worksheet = spreadsheet.worksheet("mention_command")
-#     numbers_list = worksheet.col_values(1) 
-#     message_num = ""  
-#     for i in numbers_list:
-#         message_num += f"  @{i}"  
-#     if message_num.strip():  
-#         await update.message.reply_text(message_num)
-#     else:
-#         await update.message.reply_text("No data found") 
 
 
 
