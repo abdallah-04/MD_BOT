@@ -40,12 +40,19 @@ async def send_message(update: Update, context: ContextTypes.DEFAULT_TYPE, name:
 
 
         await update.message.reply_text(message1)
+        #await context.bot.send_message(message1)
+
         await update.message.reply_text(message2)
+        #await context.bot.send_message(message2)
+
         await update.message.reply_text(message3)
+        #await context.bot.send_message(message3)
+
         await update.message.reply_text(message4)
+        # await context.bot.send_message(message4)
 
     except Exception as e:
-        print(f"Error sending message: {e}")
+        print(f"Error sending message: {e}, for id {current_last_row}")
 
 # Function to check for new entries and send messages
 async def check_new_entries(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -78,15 +85,22 @@ async def check_new_entries(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     last_processed_row = current_last_row
             await asyncio.sleep(60)  
         except Exception as e:
-            print(f"Error checking new entries: {e}")
+            print(f"Error checking new entries:{e}")
+            
             await asyncio.sleep(60)
 
 
 async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("Bot started. Checking for new entries...")
-    await update.message.re
-    asyncio.create_task(check_new_entries(update, context))  
+    await update.message.reply_text("🤌")
+    asyncio.create_task(check_new_entries(update, context))
 
+    
+# async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+#     chat_id = update.effective_chat.id
+#     await context.bot.send_message(chat_id=chat_id, text="Bot started. Checking for new entries...")
+#     await context.bot.send_message(chat_id=chat_id, text="🤌")
+#     asyncio.create_task(check_new_entries(update, context))
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("My job is to help the MD members.")
@@ -95,7 +109,6 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 # Function to update the sheet when one of the MD member send the message 
 async def update_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    
     if not context.args:
         await update.message.reply_text("🙄 شكلك ناسي شغلة! جرب:\n /update <number>")
         return
@@ -126,6 +139,7 @@ async def update_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     except ValueError:
         await update.message.reply_text("😅 Oops! That’s not a valid row number")
+
 
 
 
@@ -179,6 +193,7 @@ async def jop_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if updates:
         worksheet.batch_update(updates)
 
+
 # Function to mention all the number in the sheet 
 async def mention_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     spreadsheet = client.open_by_key(sheet_id) 
@@ -225,6 +240,26 @@ async def handle_response(update: Update, context: ContextTypes.DEFAULT_TYPE, te
         await update.message.reply_text(worksheet.acell('B12').value)
     elif 'تغير اسم الجامعة' in processed:
         await update.message.reply_text(worksheet.acell('B13').value)
+
+
+
+
+# async def handle_response(update: Update, context: ContextTypes.DEFAULT_TYPE, text: str) -> None:
+#     spreadsheet = client.open_by_key(sheet_id)
+#     worksheet = spreadsheet.worksheet("data fot the bot")
+
+   
+#     keywords = worksheet.col_values(1) 
+#     responses = worksheet.col_values(2)  
+
+   
+#     for i, keyword in enumerate(keywords):
+#         if keyword in text:
+#             await update.message.reply_text(responses[i])
+#             return  
+
+
+
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     message_type: str = update.message.chat.type
