@@ -1,9 +1,9 @@
-import time
-import math
+from typing import Dict
 import random
 import asyncio
 from google.oauth2.service_account import Credentials
 import gspread
+from gspread_formatting import get_effective_format
 from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
 from dotenv import load_dotenv,dotenv_values
@@ -26,16 +26,17 @@ bot_username = os.getenv("BOT_USERNAME")
 md_members = ["abdullah_almuflah", "Batool1412","samaweshah","Janabaha2","saja_alkhateeb97"]
 
 
+
 def get_last_row():
     return len(sheet.col_values(2))
 
 # Function to send message via Telegram bot
-async def send_message(update: Update, context: ContextTypes.DEFAULT_TYPE, name: str, phone: str,current_last_row :int):
+async def send_message(update: Update, context: ContextTypes.DEFAULT_TYPE, name: str, phone: str,current_last_row :int,message_name):
     try:
         first_name = name.split()[0]
         message1 = f"يعطيك العافيه {first_name} انا من IEEE computer society وانت مسجل بفورم الانضمام لسا حاب تسجل معنا ؟"
         message2 = f"the WhatsApp link: https://wa.me/962{phone}"
-        message3 = "@" + random.choice(md_members)
+        message3 = "@" + message_name
         message4 = current_last_row
 
 
@@ -51,8 +52,9 @@ async def send_message(update: Update, context: ContextTypes.DEFAULT_TYPE, name:
         await update.message.reply_text(message4)
         # await context.bot.send_message(message4)
 
+
     except Exception as e:
-        print(f"Error sending message: {e}, for id {current_last_row}")
+        print(f"Error sending message: {e}")
 
 # Function to check for new entries and send messages
 async def check_new_entries(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -61,39 +63,58 @@ async def check_new_entries(update: Update, context: ContextTypes.DEFAULT_TYPE):
         try:
             current_last_row = get_last_row()
             if current_last_row > last_processed_row:
+                message_name =str(random.choice(md_members))
                 name = sheet.acell(f"B{current_last_row}").value
                 phone = sheet.acell(f"D{current_last_row}").value
-                sheet.format(f"I{current_last_row}", {
+                sheet.update(f"K{current_last_row}", [[message_name]])  
+                sheet.update(f"L{current_last_row}", [["B"]])     
+                sheet.format(f"K{current_last_row}", {
     "backgroundColor": {
-        "red": 1.0,    
-        "green": 0.7,  
-        "blue": 0.0    
+        "red": 1.0,
+        "green": 1.0,
+        "blue": 1.0
     },
     "horizontalAlignment": "CENTER",
     "textFormat": {
         "foregroundColor": {
-            "red": 1.0,    
-            "green": 1.0,  
-            "blue": 1.0    
+            "red": 1.0,
+            "green": 1.0,
+            "blue": 1.0
+        },
+        "fontSize": 10,
+        "bold": False
+    }
+})      
+                sheet.format(f"I{current_last_row}", {
+    "backgroundColor": {
+        "red": 1.0,
+        "green": 1.0,
+        "blue": 0.0
+    },
+    "horizontalAlignment": "CENTER",
+    "textFormat": {
+        "foregroundColor": {
+            "red": 0.0,
+            "green": 0.0,
+            "blue": 0.0
         },
         "fontSize": 10,
         "bold": False
     }
 })
                 if name and phone:  
-                    await send_message(update, context, name, phone,current_last_row )
+                    await send_message(update, context, name, phone, current_last_row, message_name)
                     last_processed_row = current_last_row
             await asyncio.sleep(60)  
         except Exception as e:
-            print(f"Error checking new entries:{e}")
-            
+            print(f"Error checking new entries: {e}")
             await asyncio.sleep(60)
-
 
 async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("Bot started. Checking for new entries...")
     await update.message.reply_text("🤌")
     asyncio.create_task(check_new_entries(update, context))
+    asyncio.create_task(check_for_delay_command(update, context))
 
     
 # async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -104,7 +125,32 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("My job is to help the MD members.")
+    
 
+async def check_for_delay_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await asyncio.sleep(2 * 24 * 60 * 60)  
+    while True:
+        try:
+            response_status_name = sheet.col_values(11)
+            response_status = sheet.col_values(12)
+            pending_responses = {}
+
+            for i in range(len(response_status)):
+                if response_status[i] == "B":
+                    MD_name = response_status_name[i]
+                    pending_responses[MD_name] = i + 1
+
+            for name, row_id in pending_responses.items():
+                await context.bot.send_message(
+                    chat_id=update.effective_chat.id,
+                    text=f"احم احم 😶‍🌫\n@{name}\nCheck for ID {row_id}"
+                )
+
+            await asyncio.sleep(2 * 24 * 60 * 60)  
+
+        except Exception as e:
+            print(f"Error checking delay command: {e}")
+            await asyncio.sleep(60)  
 
 
 # Function to update the sheet when one of the MD member send the message 
@@ -116,12 +162,21 @@ async def update_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         row_number = int(context.args[0])
 
-
+        sheet.update(f"L{row_number}", [["D"]])
+        sheet.format(f"L{row_number}", {
+            "backgroundColor": {"red": 1.0, "green": 1.0, "blue": 1.0},
+            "horizontalAlignment": "CENTER",
+            "textFormat": {
+                "foregroundColor": {"red": 1.0, "green": 1.0, "blue": 1.0},
+                "fontSize": 10,
+                "bold": False
+            }
+        })
         sheet.format(f"I{row_number}", {
             "backgroundColor": {"red": 0.0, "green": 0.7, "blue": 0.0},
             "horizontalAlignment": "CENTER",
             "textFormat": {
-                "foregroundColor": {"red": 1.0, "green": 1.0, "blue": 1.0},
+                "foregroundColor": {"red": 0.0, "green": 0.0, "blue": 0.0},
                 "fontSize": 10,
                 "bold": False
             }
@@ -241,7 +296,33 @@ async def handle_response(update: Update, context: ContextTypes.DEFAULT_TYPE, te
     elif 'تغير اسم الجامعة' in processed:
         await update.message.reply_text(worksheet.acell('B13').value)
 
+# async def handle_response(update: Update, context: ContextTypes.DEFAULT_TYPE, text: str) -> None:
+#     spreadsheet = client.open_by_key(sheet_id) 
+#     worksheet = spreadsheet.worksheet("data fot the bot")
+#     processed: str = text.lower()
 
+#     # Fetch all the necessary values from the sheet at once
+#     data_dict: Dict[str, str] = {
+#         'فورم الانضمام': worksheet.acell('B1').value,
+#         'فورم الجدد': worksheet.acell('B2').value,
+#         'ملف md': worksheet.acell('B3').value,
+#         'تعريف عن البوت': worksheet.acell('B4').value,
+#         'فيديوهات': worksheet.acell('B5').value,
+#         'ما هو الcs': worksheet.acell('B6').value,
+#         'فوائد العضوية': worksheet.acell('B7').value,
+#         'الأوامر': worksheet.acell('B8').value,
+#         'get CS certification': worksheet.acell('B9').value,
+#         'IEEE membership information': worksheet.acell('B10').value,
+#         'join CS for ieee member': worksheet.acell('B11').value,
+#         'Renew': worksheet.acell('B12').value,
+#         'تغير اسم الجامعة': worksheet.acell('B13').value
+#     }
+
+#     # Iterate over the dictionary keys to check for matching text
+#     for keyword, response in data_dict.items():
+#         if keyword in processed:
+#             await update.message.reply_text(response)
+#             return  # Exit once the correct response is sent
 
 
 # async def handle_response(update: Update, context: ContextTypes.DEFAULT_TYPE, text: str) -> None:
