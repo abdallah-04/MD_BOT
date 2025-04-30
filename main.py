@@ -18,7 +18,6 @@ sheet_id = os.getenv("SHEET_ID")
 sheet = client.open_by_key(sheet_id).sheet1  
 
 
-# Telegram Bot setup
 token = os.getenv("TOKEN")
 bot_username = os.getenv("BOT_USERNAME")
 
@@ -40,17 +39,14 @@ async def send_message(update: Update, context: ContextTypes.DEFAULT_TYPE, name:
         message4 = current_last_row
 
 
-        await update.message.reply_text(message1)
-        #await context.bot.send_message(message1)
+        
+        await context.bot.send_message(message1)
 
-        await update.message.reply_text(message2)
-        #await context.bot.send_message(message2)
+        await context.bot.send_message(message2)
+        
+        await context.bot.send_message(message3)
 
-        await update.message.reply_text(message3)
-        #await context.bot.send_message(message3)
-
-        await update.message.reply_text(message4)
-        # await context.bot.send_message(message4)
+        await context.bot.send_message(message4)
 
 
     except Exception as e:
@@ -110,23 +106,20 @@ async def check_new_entries(update: Update, context: ContextTypes.DEFAULT_TYPE):
             print(f"Error checking new entries: {e}")
             await asyncio.sleep(60)
 
-async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("Bot started. Checking for new entries...")
-    await update.message.reply_text("🤌")
-    asyncio.create_task(check_new_entries(update, context))
-    asyncio.create_task(check_for_delay_command(update, context))
+
 
     
-# async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-#     chat_id = update.effective_chat.id
-#     await context.bot.send_message(chat_id=chat_id, text="Bot started. Checking for new entries...")
-#     await context.bot.send_message(chat_id=chat_id, text="🤌")
-#     asyncio.create_task(check_new_entries(update, context))
+async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    chat_id = update.effective_chat.id
+    await context.bot.send_message(chat_id=chat_id, text="Bot started. Checking for new entries...")
+    await context.bot.send_message(chat_id=chat_id, text="🤌")
+    asyncio.create_task(check_new_entries(update, context))
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("My job is to help the MD members.")
     
 
+# Periodically checks the sheet for delayed responses and notifies the responsible MD member
 async def check_for_delay_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await asyncio.sleep(2 * 24 * 60 * 60)  
     while True:
@@ -153,7 +146,7 @@ async def check_for_delay_command(update: Update, context: ContextTypes.DEFAULT_
             await asyncio.sleep(60)  
 
 
-# Function to update the sheet when one of the MD member send the message 
+# Updates the Google Sheet when an MD team member follows up with a new registration
 async def update_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not context.args:
         await update.message.reply_text("🙄 شكلك ناسي شغلة! جرب:\n /update <number>")
@@ -199,17 +192,18 @@ async def update_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 
-   
+# Divides the list of phone numbers that need to be contacted among MD team members,
+# generates WhatsApp links for each number, sends each MD member their assigned list,   
 async def jop_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     spreadsheet = client.open_by_key(sheet_id)
     worksheet = spreadsheet.worksheet("jop_command")
     
-    # Fetch data and filter valid numbers
+    
     numbers_list = [num.strip() for num in worksheet.col_values(1) if num.strip().isdigit()]
     md_members2 = worksheet.col_values(4)
     md_members3 = worksheet.col_values(3)
     
-    # Ensure members and metadata are aligned
+   
     if len(md_members2) != len(md_members3):
         await update.message.reply_text("Mismatched member data!")
         return
@@ -229,7 +223,7 @@ async def jop_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         count += current_chunk
         
         if not member_numbers:
-            continue  # Skip members with no numbers
+            continue  
         
         message = f"Member: @{md_members2[i]}\n"
         for number in member_numbers:
@@ -244,7 +238,7 @@ async def jop_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         else:
             await update.message.reply_text(message)
     
-    # Batch update Google Sheet
+    
     if updates:
         worksheet.batch_update(updates)
 
@@ -264,65 +258,34 @@ async def mention_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 
+
+
 async def handle_response(update: Update, context: ContextTypes.DEFAULT_TYPE, text: str) -> None:
     spreadsheet = client.open_by_key(sheet_id) 
     worksheet = spreadsheet.worksheet("data fot the bot")
     processed: str = text.lower()
 
-    if 'فورم الانضمام' in processed:
-        await update.message.reply_text(worksheet.acell('B1').value)
-    elif 'فورم الجدد' in processed:
-        await update.message.reply_text(worksheet.acell('B2').value)
-    elif 'ملف md' in processed:
-        await update.message.reply_text(worksheet.acell('B3').value)
-    elif 'تعريف عن البوت' in processed:
-        await update.message.reply_text(worksheet.acell('B4').value)
-    elif 'فيديوهات' in processed:
-        await update.message.reply_text(worksheet.acell('B5').value)
-    elif 'ما هو الcs' in processed:
-        await update.message.reply_text(worksheet.acell('B6').value)
-    elif 'فوائد العضوية' in processed:
-        await update.message.reply_text(worksheet.acell('B7').value)
-    elif 'الأوامر' in processed:
-        await update.message.reply_text(worksheet.acell('B8').value)
-    elif 'get CS certification' in processed:
-        await update.message.reply_text(worksheet.acell('B9').value)
-    elif 'IEEE membership information' in processed:
-        await update.message.reply_text(worksheet.acell('B10').value)
-    elif 'join CS for ieee member' in processed:
-        await update.message.reply_text(worksheet.acell('B11').value)
-    elif 'Renew' in processed:
-        await update.message.reply_text(worksheet.acell('B12').value)
-    elif 'تغير اسم الجامعة' in processed:
-        await update.message.reply_text(worksheet.acell('B13').value)
+    data_dict: Dict[str, str] = {
+        'فورم الانضمام': worksheet.acell('B1').value,
+        'فورم الجدد': worksheet.acell('B2').value,
+        'ملف md': worksheet.acell('B3').value,
+        'تعريف عن البوت': worksheet.acell('B4').value,
+        'فيديوهات': worksheet.acell('B5').value,
+        'ما هو الcs': worksheet.acell('B6').value,
+        'فوائد العضوية': worksheet.acell('B7').value,
+        'الأوامر': worksheet.acell('B8').value,
+        'get cs certification': worksheet.acell('B9').value,
+        'IEEE membership information': worksheet.acell('B10').value,
+        'join cs for ieee member': worksheet.acell('B11').value,
+        'renew': worksheet.acell('B12').value,
+        'تغير اسم الجامعة': worksheet.acell('B13').value
+    }
 
-# async def handle_response(update: Update, context: ContextTypes.DEFAULT_TYPE, text: str) -> None:
-#     spreadsheet = client.open_by_key(sheet_id) 
-#     worksheet = spreadsheet.worksheet("data fot the bot")
-#     processed: str = text.lower()
-
-#     # Fetch all the necessary values from the sheet at once
-#     data_dict: Dict[str, str] = {
-#         'فورم الانضمام': worksheet.acell('B1').value,
-#         'فورم الجدد': worksheet.acell('B2').value,
-#         'ملف md': worksheet.acell('B3').value,
-#         'تعريف عن البوت': worksheet.acell('B4').value,
-#         'فيديوهات': worksheet.acell('B5').value,
-#         'ما هو الcs': worksheet.acell('B6').value,
-#         'فوائد العضوية': worksheet.acell('B7').value,
-#         'الأوامر': worksheet.acell('B8').value,
-#         'get CS certification': worksheet.acell('B9').value,
-#         'IEEE membership information': worksheet.acell('B10').value,
-#         'join CS for ieee member': worksheet.acell('B11').value,
-#         'Renew': worksheet.acell('B12').value,
-#         'تغير اسم الجامعة': worksheet.acell('B13').value
-#     }
-
-#     # Iterate over the dictionary keys to check for matching text
-#     for keyword, response in data_dict.items():
-#         if keyword in processed:
-#             await update.message.reply_text(response)
-#             return  # Exit once the correct response is sent
+    
+    for keyword, response in data_dict.items():
+        if keyword in processed:
+            await update.message.reply_text(response)
+            return  
 
 
 # async def handle_response(update: Update, context: ContextTypes.DEFAULT_TYPE, text: str) -> None:
@@ -360,8 +323,6 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     print('Bot: Response sent')
 
 
-
-# Error handler
 async def error(update: Update, context: ContextTypes.DEFAULT_TYPE):
     print(f'Update {update} caused error {context.error}')
 
