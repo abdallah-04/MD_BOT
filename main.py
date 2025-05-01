@@ -261,46 +261,18 @@ async def mention_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def handle_response(update: Update, context: ContextTypes.DEFAULT_TYPE, text: str) -> None:
-    spreadsheet = client.open_by_key(sheet_id) 
+    spreadsheet = client.open_by_key(sheet_id)
     worksheet = spreadsheet.worksheet("data fot the bot")
-    processed: str = text.lower()
 
-    data_dict: Dict[str, str] = {
-        'فورم الانضمام': worksheet.acell('B1').value,
-        'فورم الجدد': worksheet.acell('B2').value,
-        'ملف md': worksheet.acell('B3').value,
-        'تعريف عن البوت': worksheet.acell('B4').value,
-        'فيديوهات': worksheet.acell('B5').value,
-        'ما هو الcs': worksheet.acell('B6').value,
-        'فوائد العضوية': worksheet.acell('B7').value,
-        'الأوامر': worksheet.acell('B8').value,
-        'get cs certification': worksheet.acell('B9').value,
-        'IEEE membership information': worksheet.acell('B10').value,
-        'join cs for ieee member': worksheet.acell('B11').value,
-        'renew': worksheet.acell('B12').value,
-        'تغير اسم الجامعة': worksheet.acell('B13').value
-    }
+   
+    keywords = worksheet.col_values(1) 
+    responses = worksheet.col_values(2)  
 
-    
-    for keyword, response in data_dict.items():
-        if keyword in processed:
-            await update.message.reply_text(response)
+   
+    for i, keyword in enumerate(keywords):
+        if keyword in text:
+            await update.message.reply_text(responses[i])
             return  
-
-
-# async def handle_response(update: Update, context: ContextTypes.DEFAULT_TYPE, text: str) -> None:
-#     spreadsheet = client.open_by_key(sheet_id)
-#     worksheet = spreadsheet.worksheet("data fot the bot")
-
-   
-#     keywords = worksheet.col_values(1) 
-#     responses = worksheet.col_values(2)  
-
-   
-#     for i, keyword in enumerate(keywords):
-#         if keyword in text:
-#             await update.message.reply_text(responses[i])
-#             return  
 
 
 
